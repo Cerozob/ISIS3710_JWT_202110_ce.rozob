@@ -22,4 +22,4 @@ Para loguearse, hay que enviar un POST a la url /login, el body debe tener los s
   }
 ```
 
-Las claves se guardan hasheadas y se verifican de la misma forma, por lo que la contraseña en texto plano sólo se usa cuando se recibe del request.
+Las claves se guardan hasheadas y se verifican de la misma forma, por lo que la contraseña en texto plano sólo se usa cuando se recibe del request. No es el sistema más robusto del mundo y se podrían usar librerías externas que tengan mejores medidas de seguridad. Pero para el propósito de este reto sirve adecuadamente.
