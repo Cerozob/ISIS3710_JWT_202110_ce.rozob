@@ -1,5 +1,8 @@
 let jwt = require( 'jsonwebtoken' );
-let config = require( './config' );
+let config = require('./config');
+const users = require("./controller/users");
+const crypto = require('crypto');
+const hash = crypto.createHash('sha512');
 
 // Clase encargada de la creación del token
 class HandlerGenerator {
@@ -9,10 +12,6 @@ class HandlerGenerator {
     // Extrae el usuario y la contraseña especificados en el cuerpo de la solicitud
     let username = req.body.username;
     let password = req.body.password;
-    
-    // Este usuario y contraseña, en un ambiente real, deben ser traidos de la BD
-    let mockedUsername = 'admin';
-    let mockedPassword = 'password';
 
     // Si se especifico un usuario y contraseña, proceda con la validación
     // de lo contrario, un mensaje de error es retornado
@@ -20,7 +19,9 @@ class HandlerGenerator {
 
       // Si los usuarios y las contraseñas coinciden, proceda con la generación del token
       // de lo contrario, un mensaje de error es retornado
-      if( username === mockedUsername && password === mockedPassword ) {
+      let user = users.getUser(username);
+
+      if( username === user.username && getHash(password) === user.password ) {
         
         // Se genera un nuevo token para el nombre de usuario el cuál expira en 24 horas
         let token = jwt.sign( { username: username },
@@ -55,6 +56,15 @@ class HandlerGenerator {
 
   }
 
+  register(req, res) {
+    let usrnam = req.body.username;
+    let passwd = req.body.password;
+    users.addUser({ username: usrnam, password: getHash(passwd) });
+    res.send(200).json{
+      message: `User saved with username ${users.getUser(usrnam).username}`,
+    }
+  }
+
   index( req, res ) {
     
     // Retorna una respuesta exitosa con previa validación del token
@@ -64,6 +74,13 @@ class HandlerGenerator {
     } );
 
   }
+}
+
+function getHash(string)
+{
+    data = hash.update(string, "utf-8");
+  gen_hash = data.digest("hex");
+  return gen_hash;
 }
 
 module.exports = HandlerGenerator;
