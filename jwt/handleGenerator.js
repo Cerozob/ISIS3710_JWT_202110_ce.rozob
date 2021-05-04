@@ -9,7 +9,7 @@ class HandlerGenerator {
     
     // Extrae el usuario y la contraseña especificados en el cuerpo de la solicitud
     let username = req.body.username;
-    let password = req.body.password;
+    let password = getHash(req.body.password);
 
     // Si se especifico un usuario y contraseña, proceda con la validación
     // de lo contrario, un mensaje de error es retornado
@@ -17,8 +17,8 @@ class HandlerGenerator {
 
       // Si los usuarios y las contraseñas coinciden, proceda con la generación del token
       // de lo contrario, un mensaje de error es retornado
-      users.getUser(username).then((user) => {
-        if( username === user.username && getHash(password) === user.password ) {
+      users.getUser(username).then( (user) => {
+        if( username === user.username && password === user.password ) {
         
         // Se genera un nuevo token para el nombre de usuario el cuál expira en 24 horas
         let token = jwt.sign( { username: username },
@@ -41,7 +41,10 @@ class HandlerGenerator {
 
       }
         
-      });
+      },()=> {res.send( 400 ).json( {
+        success: false,
+        message: 'Authentication failed! Please check the request'
+      } );});
       
 
     } else {
